@@ -1,0 +1,18 @@
+{
+    "Cloud": {
+        "cover percentage": 4,
+        "overview": "Clear sky"
+    },
+    "Humidity": {
+        "humidity percentage": 56,
+        "overview": "Moderate"
+    },
+    "Rain": {
+        "rain measure in mm/hr": 0,
+        "overview": "Light or no rain"
+    },
+    "Temperature": {
+        "temperature in celcius": 41.1,
+        "overview": "Very hot! Stay hydrated"
+    }
+}

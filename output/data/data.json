@@ -1,0 +1,44 @@
+{
+    "coord": {
+        "lon": 72.8692,
+        "lat": 19.055
+    },
+    "weather": [
+        {
+            "id": 800,
+            "main": "Clear",
+            "description": "clear sky",
+            "icon": "01d"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": 29.53,
+        "feels_like": 33.92,
+        "temp_min": 29.53,
+        "temp_max": 29.53,
+        "pressure": 1011,
+        "humidity": 70,
+        "sea_level": 1011,
+        "grnd_level": 1010
+    },
+    "visibility": 10000,
+    "wind": {
+        "speed": 1.54,
+        "deg": 174,
+        "gust": 1.48
+    },
+    "clouds": {
+        "all": 7
+    },
+    "dt": 1757483219,
+    "sys": {
+        "country": "IN",
+        "sunrise": 1757465721,
+        "sunset": 1757510167
+    },
+    "timezone": 19800,
+    "id": 8131499,
+    "name": "Konkan Division",
+    "cod": 200
+}
