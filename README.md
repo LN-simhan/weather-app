@@ -35,7 +35,7 @@ weather** data for any location using:
 
 ## Requirements
 
-Make sure you have Python 3.8+ installed.
+Python 3.8+ Required.
 
 Install required packages:
 

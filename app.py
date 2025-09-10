@@ -17,13 +17,21 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_lat_long(place):
-    # Define the API endpoint URL
+    """
+    Returns latitude and longitude based on place name.
+
+    :param place: Name of the place
+    :return: latitude, longitude
+    """
+    # API endpoint URL
     url = "https://photon.komoot.io/api/"
     params = {
         "q":place
     }
 
     response = requests.get(url,params=params)
+    
+    # Response status code check
     if response.status_code == 200:
         data = response.json()
         latitude = data["features"][0]["geometry"]["coordinates"][0]
@@ -33,16 +41,27 @@ def get_lat_long(place):
         print(f"Error: {response.status_code} - {response.text}")
 
 def get_today_older_date():
+    """
+    Returns today's and 15 day's old date.
+
+    :return: today date, old date
+    """
     gmt_offset = timezone(timedelta(hours=5.5))
     current_date = datetime.now(gmt_offset)
 
-    # Get today's and yesterday's date in YYYY-MM-DD format
+    # Get today's and old_date in YYYY-MM-DD format
     today = current_date.date()
-    yesterday = (current_date - timedelta(days=15)).date()
+    old_date = (current_date - timedelta(days=15)).date()
 
-    return today.isoformat(), yesterday.isoformat()
+    return today.isoformat(), old_date.isoformat()
 
 def get_current_weather(place):
+    """
+    Returns current weather data based on place name.
+
+    :param place: Name of the place
+    :return: json string and output summary string
+    """
     long,lat = get_lat_long(place)
     url = "https://api.openweathermap.org/data/2.5/weather"
     print(f"latitude {lat}, longitude {long}")
@@ -61,6 +80,8 @@ def get_current_weather(place):
             json.dump(data,f,indent=4)
     else:
         print(f"Error: {response.status_code} - {response.text}")
+
+    # Extraction of necessary data
     cloud = data["clouds"]["all"]
     humidity = data["main"]["humidity"]
     maxTemp = data["main"]["temp_max"]
@@ -71,6 +92,7 @@ def get_current_weather(place):
     description_cloud = interpret_weather_by_clouds(cloud)
     description_humidity = interpret_weather_by_humidity(humidity)
     description_temperature = interpret_temperature_celsius(actualTemp)
+
     print(f"Cloud Cover: {cloud}% → {description_cloud}")
     print(f"Humidity: {humidity}% → {description_humidity}")
     print(f"The Max and Min temperature are {maxTemp}C and {minTemp}C respectively but it acutally feels like {actualTemp}C")
@@ -98,6 +120,12 @@ def get_current_weather(place):
     return json_str , outputString
 
 def get_historic_data(place):
+    """
+    Returns historic weather data based on place name.
+
+    :param place: Name of the place
+    :return: dataframe of the daily data retrieved
+    """
     lat,long = get_lat_long(place)
     today, n_days_ago_date = get_today_older_date()
 
@@ -105,8 +133,7 @@ def get_historic_data(place):
     retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
     openmeteo = openmeteo_requests.Client(session = retry_session)
 
-    # Make sure all required weather variables are listed here
-    # The order of variables in hourly or daily is important to assign them correctly below
+    # API call
     url = "https://api.open-meteo.com/v1/forecast"
     params = {
         "latitude": lat,
@@ -120,7 +147,7 @@ def get_historic_data(place):
     response = responses[0]
     print(f"Coordinates: {response.Latitude()}°N {response.Longitude()}°E")
 
-    # Process daily data. The order of variables needs to be the same as requested.
+    # Extraction of necessary data
     daily = response.Daily()
     daily_temperature_2m_max = daily.Variables(0).ValuesAsNumpy()
     daily_temperature_2m_min = daily.Variables(1).ValuesAsNumpy()
@@ -135,6 +162,7 @@ def get_historic_data(place):
         inclusive = "left"
     )}
 
+    # Creation of data frame
     daily_data["temperature_2m_max"] = daily_temperature_2m_max
     daily_data["temperature_2m_min"] = daily_temperature_2m_min
     daily_data["rain_sum"] = daily_rain_sum
@@ -248,7 +276,7 @@ def single_plot(fig,place):
     ax1.set_xlabel("Date")
     ax1.tick_params(axis='y', labelcolor='darkred')
     
-    # Create secondary y-axis for rainfall
+    # secondary y-axis for rainfall
     ax2 = ax1.twinx()
     ax2.bar(daily_dataframe["date"], 
             daily_dataframe["rain_sum"], 
@@ -260,12 +288,12 @@ def single_plot(fig,place):
     # Date formatting
     fig.autofmt_xdate()
     
-    # Add legends combining lines and bars
+    # Legends combining lines and bars
     lines, labels = ax1.get_legend_handles_labels()
     bars, bar_labels = ax2.get_legend_handles_labels()
     ax1.legend(lines + bars, labels + bar_labels, loc="upper left",fontsize='xx-small')
     
-    # Set title
+    # Title
     fig.suptitle("15 days Max/Min Temperature and Rainfall correlation")
     
     # Tight layout to prevent clipping
