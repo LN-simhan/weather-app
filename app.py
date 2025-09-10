@@ -126,7 +126,7 @@ def get_historic_data(place):
     :param place: Name of the place
     :return: dataframe of the daily data retrieved
     """
-    lat,long = get_lat_long(place)
+    long,lat = get_lat_long(place)
     today, n_days_ago_date = get_today_older_date()
 
     cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
